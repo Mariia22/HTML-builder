@@ -7,13 +7,13 @@ const pathFile = path.join(__dirname, 'destination.txt');
 
 function closeFile(readLine, message) {
   readLine.close();
-  stdout.write(message);
+  stdout.write(message + '\n');
 }
 
 fs.open(pathFile, 'w', (err) => {
   if (err) throw err;
 });
-stdout.write('Hello!!! Please, write your message\n');
+stdout.write('Hello!!! Please, write your message!\n');
 let rl = readline.createInterface(stdin, stdout);
 rl.on('line', (line) => {
   if (line === 'exit') {
