@@ -4,7 +4,6 @@ const path = require('path');
 
 const pathToSource = path.join(__dirname, './styles');
 const extension = '.css';
-const resultArray = [];
 
 const readFileAsync = async (path) => {
   return new Promise((resolve, reject) => fs.readFile(path, { encoding: 'utf-8' }, (err, data) => {
@@ -25,6 +24,7 @@ const writeFileAsync = async (path, data) => {
 };
 
 (async function grabDataFromStyles() {
+  const resultArray = [];
   const files = await readdir(pathToSource, { encoding: 'utf-8', withFileTypes: true });
   const bundle = path.join(__dirname, './project-dist', 'bundle.css');
   fs.open(bundle, 'w', (error) => {
