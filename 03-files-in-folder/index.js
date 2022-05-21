@@ -15,7 +15,7 @@ const dir = path.join(__dirname, './secret-folder');
           try {
             if (err) throw err;
             const size = (stats.size / bytesToKb).toFixed(3);
-            console.log(`${name} - ${ext} - ${size}kb`);
+            console.log(`${name} - ${ext} - ${size}kB`);
           }
           catch (error) {
             console.log(error);
