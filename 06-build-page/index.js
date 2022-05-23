@@ -22,6 +22,27 @@ async function createFolder(path) {
   });
 }
 
+async function deleteFiles(path) {
+  const arr = await readdir(path, { encoding: 'utf-8', withFileTypes: true });
+  if (arr.length !== 0) {
+    arr.forEach((file) => {
+      if (file.isFile()) {
+        unlink(`${path}/${file.name}`, error => {
+          try {
+            if (error) throw error;
+          }
+          catch (error) {
+            console.log(error);
+          }
+        });
+      }
+      else {
+        deleteFiles(path + '/' + file.name);
+      }
+    });
+  }
+}
+
 const readFileAsync = async (path) => {
   return new Promise((resolve, reject) => fs.readFile(path, { encoding: 'utf-8' }, (err, data) => {
     if (err) {
@@ -71,17 +92,7 @@ const copyFiles = async (files, name) => {
 
 (async function bundleWeb() {
   await createFolder(pathToDest);
-  const filesDest = await readdir(pathToDest, { encoding: 'utf-8', withFileTypes: true });
-  if (filesDest.length !== 0) {
-    unlink(`${pathToDest}/index.html`, error => {
-      try {
-        if (error) throw error;
-      }
-      catch (error) {
-        console.log(error);
-      }
-    });
-  }
+  await deleteFiles(pathToDest);
   const bundleHTML = path.join(__dirname, './project-dist', 'index.html');
   const bundleCSS = path.join(__dirname, './project-dist', 'style.css');
   await createFolder(pathToDestAssets);
