@@ -11,7 +11,7 @@ const pathToDestAssets = path.join(__dirname, './project-dist', './assets');
 const extensionTemplate = '.html';
 const extensionStyle = '.css';
 
-function createFolder(path) {
+async function createFolder(path) {
   mkdir(path, { recursive: true }, (error) => {
     try {
       if (error) throw error;
@@ -46,22 +46,33 @@ const openFileForWriting = (file) => {
   });
 };
 
-const copyFiles = (name, arrFiles) => {
-  arrFiles.forEach((file) => copyFile(`${pathToAssets}/${name}/${file.name}`, `${pathToDestAssets}/${name}/${file.name}`, 0, (error) => {
-    try {
-      if (error) throw error;
-    }
-    catch (error) {
-      console.log(error);
-    }
-  }));
+const copyFiles = async (files, name) => {
+  if (Array.isArray(files)) {
+    files.forEach((file) => copyFile(`${pathToAssets}/${name}/${file.name}`, `${pathToDestAssets}/${name}/${file.name}`, 0, (error) => {
+      try {
+        if (error) throw error;
+      }
+      catch (error) {
+        console.log(error);
+      }
+    }));
+  }
+  else {
+    copyFile(`${pathToAssets}/${files}`, `${pathToDestAssets}/${files}`, 0, (error) => {
+      try {
+        if (error) throw error;
+      }
+      catch (error) {
+        console.log(error);
+      }
+    });
+  }
 };
 
 (async function bundleWeb() {
-  createFolder(pathToDest);
+  await createFolder(pathToDest);
   const filesDest = await readdir(pathToDest, { encoding: 'utf-8', withFileTypes: true });
   if (filesDest.length !== 0) {
-    console.log('here');
     unlink(`${pathToDest}/index.html`, error => {
       try {
         if (error) throw error;
@@ -73,7 +84,7 @@ const copyFiles = (name, arrFiles) => {
   }
   const bundleHTML = path.join(__dirname, './project-dist', 'index.html');
   const bundleCSS = path.join(__dirname, './project-dist', 'style.css');
-  createFolder(pathToDestAssets);
+  await createFolder(pathToDestAssets);
 
   const files = await readdir(pathToSource, { encoding: 'utf-8', withFileTypes: true });
   for (const file of files) {
@@ -106,16 +117,15 @@ const copyFiles = (name, arrFiles) => {
       }
     }
     else if (file.isDirectory() && file.name === 'assets') {
-      createFolder(pathToDestAssets);
       const filesAssets = await readdir(pathToAssets, { encoding: 'utf-8', withFileTypes: true });
       for (let asset of filesAssets) {
         if (asset.isDirectory()) {
-          createFolder(path.join(__dirname, './project-dist', './assets', asset.name));
+          await createFolder(path.join(__dirname, './project-dist', './assets', asset.name));
           const files = await readdir(path.join(__dirname, './assets', asset.name), { encoding: 'utf-8', withFileTypes: true });
-          copyFiles(asset.name, files);
+          copyFiles(files, asset.name);
         }
         else {
-          copyFiles(asset);
+          copyFiles(asset.name);
         }
       }
     }
