@@ -1,4 +1,4 @@
-const { mkdir, readdir, unlink, copyFile } = require('fs/promises');
+const { mkdir, readdir, unlink, copyFile, writeFile } = require('fs/promises');
 const fs = require('fs');
 const path = require('path');
 
@@ -53,7 +53,7 @@ const readFileAsync = async (path) => {
 };
 
 const writeFileAsync = async (path, data) => {
-  return new Promise((resolve, reject) => fs.writeFile(path, data, (err) => {
+  return new Promise((resolve, reject) => writeFile(path, data, (err) => {
     if (err) {
       return reject(err.message);
     }
@@ -109,7 +109,7 @@ const copyFiles = async (files, name) => {
         for (const item of arrRegEx) {
           readFileAsync(`${pathToComponents}/${item.slice(2, -2)}${extensionTemplate}`)
             .then((result) => data = data.replace(item, result))
-            .then(() => writeFileAsync(bundleHTML, data))
+            .then((data) => writeFileAsync(bundleHTML, data))
             .catch(error => console.log(error));
         }
       });
